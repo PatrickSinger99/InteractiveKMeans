@@ -14,36 +14,44 @@ class Display(tk.Tk):
 
         """CONTROL AREA"""
 
+        # FRAME: Control Area
         self.control_frame = tk.Frame(self, width=200, height=500, bg="light grey")
         self.control_frame.pack_propagate(False)
         self.control_frame.pack(side="left")
 
+        # CONTROL: Start run
         self.start_button = tk.Button(self.control_frame, text="Start", command=self.on_start_button)
         self.start_button.pack()
 
+        # DISPLAY: Start validation info (Info on invalid configurations)
         self.validation_info = tk.Label(self.control_frame, text="", fg="red")
         self.validation_info.pack()
 
+        # CONTROL: Centroid count
         self.centroid_slider_variable = tk.IntVar()
         self.centroid_slider = tk.Scale(self.control_frame, from_=1, to=10, orient=tk.HORIZONTAL,
                                         variable=self.centroid_slider_variable)
         self.centroid_slider.pack()
 
+        # CONTROL: Simulation speed
         self.speed_slider_variable = tk.IntVar()
         self.speed_slider = tk.Scale(self.control_frame, from_=1, to=10, orient=tk.HORIZONTAL,
                                      variable=self.speed_slider_variable)
         self.speed_slider_variable.set(5)
         self.speed_slider.pack()
 
+        # CONTROL: Reset run and observations
         self.reset_observations_button = tk.Button(self.control_frame, text="Reset", command=self.reset_run)
         self.reset_observations_button.pack()
 
+        # CONTROL: Random observation adding intensity (Combination of amount and spread)
         self.random_intencity_slider_variable = tk.IntVar()
         self.random_intencity_slider = tk.Scale(self.control_frame, from_=1, to=50, orient=tk.HORIZONTAL,
                                                 variable=self.random_intencity_slider_variable)
         self.random_intencity_slider_variable.set(15)
         self.random_intencity_slider.pack()
 
+        # CONTROL: Add random observations
         self.add_random_obs_button = tk.Button(self.control_frame, text="Add randoms", command=self.add_random_obs)
         self.add_random_obs_button.pack()
 
