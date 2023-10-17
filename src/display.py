@@ -10,18 +10,19 @@ class Display(tk.Tk):
 
         """APP SETTINGS"""
 
-        self.title("Clustering Demo")
+        self.title("K-Means Demo")
         self.resizable(False, False)
+        self.configure(bg="grey")
 
         """SIDE AREA"""
 
         # FRAME: Side Area
         self.side_frame = tk.Frame(self, width=200, height=500)
         self.side_frame.pack_propagate(False)
-        self.side_frame.pack(side="left")
+        self.side_frame.pack(side="left", pady=5, padx=(5, 0))
 
         # TITLE BAR
-        self.title_bar = tk.Label(self.side_frame, text="Clustering Demo", bg="grey", fg="white",
+        self.title_bar = tk.Label(self.side_frame, text="K-Means Demo", bg="grey", fg="white",
                                   font=Font(size=12, weight="bold"))
         self.title_bar.pack(fill="x", ipady=5)
 
@@ -99,7 +100,7 @@ class Display(tk.Tk):
 
         self.canvas_frame = tk.Frame(self, width=500, height=500)
         self.canvas_frame.pack_propagate(False)
-        self.canvas_frame.pack(side="right")
+        self.canvas_frame.pack(side="right", padx=5, pady=5)
 
         self.canvas = tk.Canvas(self.canvas_frame, bg="white", highlightthickness=0, relief="ridge", cursor="hand2")
         self.canvas.pack(fill="both", expand=True)
