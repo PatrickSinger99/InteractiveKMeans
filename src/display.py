@@ -10,7 +10,7 @@ class Display(tk.Tk):
 
         """APP SETTINGS"""
 
-        self.title("K-Means Experiment")
+        self.title("Clustering Demo")
         self.resizable(False, False)
 
         """SIDE AREA"""
@@ -21,7 +21,8 @@ class Display(tk.Tk):
         self.side_frame.pack(side="left")
 
         # TITLE BAR
-        self.title_bar = tk.Label(self.side_frame, text="Clustering Demo", bg="grey", font=Font(size=12))
+        self.title_bar = tk.Label(self.side_frame, text="Clustering Demo", bg="grey", fg="white",
+                                  font=Font(size=12, weight="bold"))
         self.title_bar.pack(fill="x", ipady=5)
 
         """CONTROL AREA"""
@@ -31,24 +32,26 @@ class Display(tk.Tk):
         self.control_frame.pack(padx=10)
 
         # SETTINGS CATEGORY: General Settings
-        tk.Label(self.control_frame, text="1. General Settings", font=Font(weight="bold", size=9), anchor="w").pack(fill="x")
+        (tk.Label(self.control_frame, text="1. General Settings", font=Font(weight="bold", size=9), anchor="w")
+         .pack(fill="x"))
 
         # CONTROL: Centroid count
         self.centroid_slider_variable = tk.IntVar()
         self.centroid_slider = tk.Scale(self.control_frame, from_=1, to=10, orient=tk.HORIZONTAL, label="Centroids",
-                                        variable=self.centroid_slider_variable)
+                                        variable=self.centroid_slider_variable, cursor="hand2")
         self.centroid_slider_variable.set(2)
         self.centroid_slider.pack(fill="x")
 
         # CONTROL: Simulation speed
         self.speed_slider_variable = tk.IntVar()
         self.speed_slider = tk.Scale(self.control_frame, from_=1, to=10, orient=tk.HORIZONTAL, label="Simulation Speed",
-                                     variable=self.speed_slider_variable)
+                                     variable=self.speed_slider_variable, cursor="hand2")
         self.speed_slider_variable.set(5)
         self.speed_slider.pack(fill="x")
 
         # SETTINGS CATEGORY: Observations
-        tk.Label(self.control_frame, text="2. Add Points", font=Font(weight="bold", size=9), anchor="w").pack(fill="x", pady=(10, 0))
+        (tk.Label(self.control_frame, text="2. Add Points", font=Font(weight="bold", size=9), anchor="w")
+         .pack(fill="x", pady=(10, 0)))
         tk.Label(self.control_frame, text="Add points by clicking directly on the grid, or add random points below.",
                  wraplength=200, anchor="w", justify="left", fg="grey").pack(fill="x")
 
@@ -59,7 +62,8 @@ class Display(tk.Tk):
         # CONTROL: Random observation adding intensity (Combination of amount and spread)
         self.random_intencity_slider_variable = tk.IntVar()
         self.random_intencity_slider = tk.Scale(self.random_control_frame, from_=1, to=50, orient=tk.HORIZONTAL,
-                                                variable=self.random_intencity_slider_variable, label="Amount")
+                                                variable=self.random_intencity_slider_variable, label="Amount",
+                                                cursor="hand2")
         self.random_intencity_slider_variable.set(15)
         self.random_intencity_slider.pack(side="left", fill="x", expand=True)
 
@@ -79,7 +83,7 @@ class Display(tk.Tk):
 
         # CONTROL: Reset run and observations
         self.reset_observations_button = tk.Button(self.sim_exec_controls, text="Reset", command=self.reset_run,
-                                                   state="disabled", bg="light grey")
+                                                   bg="light grey", cursor="hand2")
         self.reset_observations_button.grid(row=0, column=0, ipadx=5, ipady=2)
 
         # CONTROL: Start run
@@ -114,13 +118,13 @@ class Display(tk.Tk):
         self.new_observations.append((event.x, event.y))
 
     def draw_point(self, x, y, size=10, color="black", centroid=False):
-        fac = int(size/2)  # Offset factor for edges of the point
+        fac = int(size / 2)  # Offset factor for edges of the point
 
         # Draw circle on canvas. Centroids are displayed as outline. Obervations are filled in
         if centroid:
-            self.canvas.create_oval(x-fac, y-fac, x+fac, y+fac, width=2, fill="", outline=color)
+            self.canvas.create_oval(x - fac, y - fac, x + fac, y + fac, width=2, fill="", outline=color)
         else:
-            self.canvas.create_oval(x-fac, y-fac, x+fac, y+fac, width=0, fill=color)
+            self.canvas.create_oval(x - fac, y - fac, x + fac, y + fac, width=0, fill=color)
 
     def draw_state(self, observations, classes, centroids):
         # Check if the current class colors are still valid
@@ -137,13 +141,12 @@ class Display(tk.Tk):
 
     @staticmethod
     def get_random_color():
-        r = lambda: random.randint(0, 255)
-        return '#%02X%02X%02X' % (r(), r(), r())
+        def rand_int(): return random.randint(0, 255)
+        return '#%02X%02X%02X' % (rand_int(), rand_int(), rand_int())
 
     def run(self, k_means: KMeans):
         # Only run if k means instance is still current running instance
         if k_means == self.k_means_instance:
-
             # Update k means class instance
             k_means.step(new_observations=self.new_observations)
             self.new_observations = []  # Reset bc they have been added to the k means class instance
@@ -164,13 +167,12 @@ class Display(tk.Tk):
         # Validate start conditions
         if len(self.new_observations) < self.centroid_slider_variable.get():
             # CASE: INVALID START
-            self.validation_info.configure(text="Cant have more centroids than observations!")
+            self.validation_info.configure(text="Can't have more centroids than observations!")
             return
 
         # CASE: VALID START
         self.start_button.configure(text="Restart")
         self.validation_info.configure(text="")
-        self.reset_observations_button.configure(cursor="hand2", state="active")
 
         # Create new k means class instance
         k_means_instance = KMeans(observations=self.new_observations, k=self.centroid_slider_variable.get())
@@ -184,7 +186,7 @@ class Display(tk.Tk):
         self.after(self.get_speed(), lambda: self.run(k_means_instance))
 
     def get_speed(self):
-        return int(1000/self.speed_slider_variable.get())
+        return int(1000 / self.speed_slider_variable.get())
 
     def reset_run(self):
         self.k_means_instance = None
@@ -196,8 +198,8 @@ class Display(tk.Tk):
         intensity = self.random_intencity_slider_variable.get()
 
         for _ in range(intensity):
-            rand_x, rand_y = (random.randint(center_x-intensity*3, center_x+intensity*3),
-                              random.randint(center_y-intensity*3, center_y+intensity*3))
+            rand_x, rand_y = (random.randint(center_x - intensity * 3, center_x + intensity * 3),
+                              random.randint(center_y - intensity * 3, center_y + intensity * 3))
 
             self.draw_point(rand_x, rand_y)
             self.new_observations.append((rand_x, rand_y))
