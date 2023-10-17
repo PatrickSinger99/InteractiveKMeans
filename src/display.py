@@ -1,6 +1,7 @@
 import tkinter as tk
 import random
 from k_means import KMeans
+from tkinter.font import Font
 
 
 class Display(tk.Tk):
@@ -12,48 +13,83 @@ class Display(tk.Tk):
         self.title("K-Means Experiment")
         self.resizable(False, False)
 
+        """SIDE AREA"""
+
+        # FRAME: Side Area
+        self.side_frame = tk.Frame(self, width=200, height=500)
+        self.side_frame.pack_propagate(False)
+        self.side_frame.pack(side="left")
+
+        # TITLE BAR
+        self.title_bar = tk.Label(self.side_frame, text="Clustering Demo", bg="grey", font=Font(size=12))
+        self.title_bar.pack(fill="x", ipady=5)
+
         """CONTROL AREA"""
 
         # FRAME: Control Area
-        self.control_frame = tk.Frame(self, width=200, height=500, bg="light grey")
-        self.control_frame.pack_propagate(False)
-        self.control_frame.pack(side="left")
+        self.control_frame = tk.Frame(self.side_frame, bg=self.side_frame.cget("bg"))
+        self.control_frame.pack(padx=10)
 
-        # CONTROL: Start run
-        self.start_button = tk.Button(self.control_frame, text="Start", command=self.on_start_button)
-        self.start_button.pack()
-
-        # DISPLAY: Start validation info (Info on invalid configurations)
-        self.validation_info = tk.Label(self.control_frame, text="", fg="red")
-        self.validation_info.pack()
+        # SETTINGS CATEGORY: General Settings
+        tk.Label(self.control_frame, text="1. General Settings", font=Font(weight="bold", size=9), anchor="w").pack(fill="x")
 
         # CONTROL: Centroid count
         self.centroid_slider_variable = tk.IntVar()
-        self.centroid_slider = tk.Scale(self.control_frame, from_=1, to=10, orient=tk.HORIZONTAL,
+        self.centroid_slider = tk.Scale(self.control_frame, from_=1, to=10, orient=tk.HORIZONTAL, label="Centroids",
                                         variable=self.centroid_slider_variable)
-        self.centroid_slider.pack()
+        self.centroid_slider_variable.set(2)
+        self.centroid_slider.pack(fill="x")
 
         # CONTROL: Simulation speed
         self.speed_slider_variable = tk.IntVar()
-        self.speed_slider = tk.Scale(self.control_frame, from_=1, to=10, orient=tk.HORIZONTAL,
+        self.speed_slider = tk.Scale(self.control_frame, from_=1, to=10, orient=tk.HORIZONTAL, label="Simulation Speed",
                                      variable=self.speed_slider_variable)
         self.speed_slider_variable.set(5)
-        self.speed_slider.pack()
+        self.speed_slider.pack(fill="x")
 
-        # CONTROL: Reset run and observations
-        self.reset_observations_button = tk.Button(self.control_frame, text="Reset", command=self.reset_run)
-        self.reset_observations_button.pack()
+        # SETTINGS CATEGORY: Observations
+        tk.Label(self.control_frame, text="2. Add Points", font=Font(weight="bold", size=9), anchor="w").pack(fill="x", pady=(10, 0))
+        tk.Label(self.control_frame, text="Add points by clicking directly on the grid, or add random points below.",
+                 wraplength=200, anchor="w", justify="left", fg="grey").pack(fill="x")
+
+        # SUB FRAME: Random points controls
+        self.random_control_frame = tk.Frame(self.control_frame)
+        self.random_control_frame.pack(fill="x")
 
         # CONTROL: Random observation adding intensity (Combination of amount and spread)
         self.random_intencity_slider_variable = tk.IntVar()
-        self.random_intencity_slider = tk.Scale(self.control_frame, from_=1, to=50, orient=tk.HORIZONTAL,
-                                                variable=self.random_intencity_slider_variable)
+        self.random_intencity_slider = tk.Scale(self.random_control_frame, from_=1, to=50, orient=tk.HORIZONTAL,
+                                                variable=self.random_intencity_slider_variable, label="Amount")
         self.random_intencity_slider_variable.set(15)
-        self.random_intencity_slider.pack()
+        self.random_intencity_slider.pack(side="left", fill="x", expand=True)
 
         # CONTROL: Add random observations
-        self.add_random_obs_button = tk.Button(self.control_frame, text="Add randoms", command=self.add_random_obs)
-        self.add_random_obs_button.pack()
+        self.add_random_obs_button = tk.Button(self.random_control_frame, text="Place\nRandom", bg="light grey",
+                                               command=self.add_random_obs, cursor="hand2")
+        self.add_random_obs_button.pack(side="right", fill="y")
+
+        # SETTINGS CATEGORY: Observations
+        (tk.Label(self.control_frame, text="3. Start Simulation", font=Font(weight="bold", size=9), anchor="w")
+         .pack(fill="x", pady=(10, 0)))
+
+        # FRAME: Exec Buttons
+        self.sim_exec_controls = tk.Frame(self.control_frame)
+        self.sim_exec_controls.pack(fill="x", pady=(5, 0))
+        self.sim_exec_controls.columnconfigure(1, weight=1)
+
+        # CONTROL: Reset run and observations
+        self.reset_observations_button = tk.Button(self.sim_exec_controls, text="Reset", command=self.reset_run,
+                                                   state="disabled", bg="light grey")
+        self.reset_observations_button.grid(row=0, column=0, ipadx=5, ipady=2)
+
+        # CONTROL: Start run
+        self.start_button = tk.Button(self.sim_exec_controls, text="Start", command=self.on_start_button,
+                                      cursor="hand2", bg="#8ACE88")
+        self.start_button.grid(row=0, column=1, sticky="ew", ipady=2)
+
+        # DISPLAY: Start validation info (Info on invalid configurations)
+        self.validation_info = tk.Label(self.sim_exec_controls, text="", fg="red", wraplength=200)
+        self.validation_info.grid(row=1, column=0, columnspan=2)
 
         """CANVAS AREA"""
 
@@ -61,7 +97,7 @@ class Display(tk.Tk):
         self.canvas_frame.pack_propagate(False)
         self.canvas_frame.pack(side="right")
 
-        self.canvas = tk.Canvas(self.canvas_frame, bg="white", highlightthickness=0, relief="ridge")
+        self.canvas = tk.Canvas(self.canvas_frame, bg="white", highlightthickness=0, relief="ridge", cursor="hand2")
         self.canvas.pack(fill="both", expand=True)
 
         self.canvas.bind("<Button 1>", lambda e: self.on_canvas_click(e))
@@ -134,6 +170,7 @@ class Display(tk.Tk):
         # CASE: VALID START
         self.start_button.configure(text="Restart")
         self.validation_info.configure(text="")
+        self.reset_observations_button.configure(cursor="hand2", state="active")
 
         # Create new k means class instance
         k_means_instance = KMeans(observations=self.new_observations, k=self.centroid_slider_variable.get())
